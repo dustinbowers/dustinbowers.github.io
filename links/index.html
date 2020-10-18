@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Links - Dustin Bowers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" integrity="sha512-EZLkOqwILORob+p0BXZc+Vm3RgJBOe1Iq/0fiI7r/wJgzOFZMlsqTa29UEl6v6U6gsV4uIpsNZoV32YZqrCRCQ==" crossorigin="anonymous" />
+    <style>
+        thead {
+            font-size: 2rem;
+        }
+        td {
+            max-width: 64ch;
+            overflow-wrap: anywhere;
+        }
+    </style>
+</head>
+<body>
+    <header><h1>Links</h1></header>
+    <main>
+        <form>
+            <input type="password" id="passphrase" name="passphrase" placeholder="Passphrase" /><br />
+            <input type="text" id="name" name="name" placeholder="Name" />
+            <input type="text" id="url" name="url" placeholder="URL" />
+            <button class="button-primary">Add</button>
+        </form>
+        <div id="links">
+            <table>
+                <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>URL</td>
+                    <td>Date</td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tbody id="linksBody">
+
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <script>
+        const API_BASE_URL = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') ? 'http://localhost:3000/' : 'https://dustinbowers-github-io.vercel.app/'
+        const LINKS_URL = API_BASE_URL + 'links'
+        const formElement = document.querySelector('form')
+        const linksBodyElement = document.querySelector("#linksBody")
+
+        listLinks()
+
+        formElement.addEventListener('submit', (event) => {
+            event.preventDefault()
+            createLink()
+        })
+
+        function createLink() {
+            const fd = new FormData(formElement)
+            const passphrase = fd.get('passphrase')
+            const name = fd.get('name')
+            const url = fd.get('url')
+            if (passphrase.length > 0
+                && url.length > 0) {
+                const newLink = {
+                    passphrase,
+                    name,
+                    url
+                }
+                fetch(LINKS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(newLink),
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                }).then(response => {
+                    if (!response.ok) {
+                        const contentType = response.headers.get('content-type')
+                        if (contentType.includes('json')) {
+                            return response.json().then(error => Promise.reject(error.message))
+                        } else {
+                            return response.text().then(message => Promise.reject(message))
+                        }
+                    }
+                }).then(() => {
+                    document.querySelector('#name').value = '';
+                    document.querySelector('#url').value = '';
+                    listLinks()
+                }).catch(errorMessage => {
+                    console.error(errorMessage)
+                })
+            }
+        }
+
+        function removeLink(id) {
+            if (confirm("Really delete?")) {
+                const deleteLink = {
+                    _id: id,
+                    passphrase: document.querySelector("#passphrase").value
+                }
+                fetch(LINKS_URL+'/'+id+'/delete', {
+                    method: 'POST',
+                    body: JSON.stringify(deleteLink),
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                }).then(() => {
+                    listLinks()
+                }).catch(errorMessage => {
+                    console.error(errorMessage)
+                });
+            }
+        }
+
+        function listLinks() {
+            fetch(LINKS_URL)
+                .then(response => response.json())
+                .then(results => {
+                    linksBodyElement.innerHTML = ''
+                    results.reverse()
+                    results.forEach(link => {
+                        const tr = document.createElement('tr')
+
+                        const tdName = document.createElement('td')
+                        tdName.innerText = link.name
+
+                        const tdUrl = document.createElement('td')
+                        tdUrl.innerText = link.url
+
+                        const tdDate = document.createElement('td')
+                        tdDate.innerText = link.created
+
+                        const tdDelete = document.createElement('td')
+                        tdDelete.innerHTML = `<a href="#" onClick="removeLink('${link._id}')">Delete</a>`
+
+                        tr.appendChild(tdName)
+                        tr.appendChild(tdUrl)
+                        tr.appendChild(tdDate)
+                        tr.appendChild(tdDelete)
+
+                        linksBodyElement.appendChild(tr)
+                    })
+                })
+        }
+    </script>
+</body>
+</html>
