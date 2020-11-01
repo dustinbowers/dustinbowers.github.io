@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const monk = require('monk');
+const morgan = require('morgan');
+const helmet = require('helmet');
 
 const app = express();
 
@@ -10,6 +12,8 @@ const links = db.get('links')
 
 app.enable('trust proxy')
 app.use(cors())
+app.use(morgan('common'))
+app.use(helmet())
 app.use(express.json())
 
 
