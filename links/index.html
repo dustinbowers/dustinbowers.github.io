@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Links - Dustin Bowers</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" integrity="sha512-EZLkOqwILORob+p0BXZc+Vm3RgJBOe1Iq/0fiI7r/wJgzOFZMlsqTa29UEl6v6U6gsV4uIpsNZoV32YZqrCRCQ==" crossorigin="anonymous" />
+    <link href="/css/style.css" rel="stylesheet">
     <style>
         thead {
             font-size: 2rem;
@@ -15,8 +16,9 @@
     </style>
 </head>
 <body>
-    <header><h1>Links</h1></header>
+    <header onclick="window.location='/'">Dustin Bowers</header>
     <main>
+        <h3>Links</h3>
         <form>
             <input type="password" id="passphrase" name="passphrase" placeholder="Passphrase" /><br />
             <input type="text" id="name" name="name" placeholder="Name" />
@@ -39,6 +41,8 @@
             </table>
         </div>
     </main>
+    <footer>dustinbowers.com 2020</footer>
+    <script src="https://use.fontawesome.com/bc5e4dc8ed.js"></script>
     <script>
         const API_BASE_URL = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') ? 'http://localhost:3000/' : 'https://dustinbowers-github-io.vercel.app/'
         const LINKS_URL = API_BASE_URL + 'links'
