@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<script src="wasm_exec.js"></script>
+<script>
+  const go = new Go()
+
+  // "exports"
+  function resetChip8() {}
+  function pause() {}
+  function resume() {}
+
+  function loadWasm() {
+    return WebAssembly.instantiateStreaming(fetch("/chip8.wasm"), go.importObject).then(result => {
+      go.run(result.instance);
+    });
+  }
+
+  function loadRom(id) {
+    pause();
+    let oReq = new XMLHttpRequest()
+    oReq.open("GET", "/roms/games/Space%20Invaders%20%5BDavid%20Winter%5D.ch8", true)
+    oReq.responseType = "arraybuffer"
+
+    oReq.onload = function (oEvent) {
+      const arrayBuffer = oReq.response
+      if (arrayBuffer) {
+        const byteArray = new Uint8Array(arrayBuffer)
+        resetChip8(byteArray)
+      }
+      resume();
+    }
+
+    oReq.send(null)
+  }
+
+  loadWasm()
+    .then(() => { loadRom(1) })
+</script>
