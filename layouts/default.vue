@@ -5,9 +5,13 @@
       fixed
       app
     >
-      <v-spacer></v-spacer>
-      <v-toolbar-title v-text="title" />
-      <v-spacer></v-spacer>
+      <v-spacer />
+      <v-toolbar-title
+        @click="$router.push('/')"
+        style="cursor:pointer"
+        class="display-1"
+        v-text="title" />
+      <v-spacer />
     </v-app-bar>
     <v-main>
       <v-container>
